@@ -8,7 +8,7 @@ extern crate cpal;
 
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
-    SizedSample,
+    SizedSample, I24,
 };
 use cpal::{FromSample, Sample};
 
@@ -98,6 +98,7 @@ where
     match config.sample_format() {
         cpal::SampleFormat::I8 => make_stream::<i8>(&device, &config.into()),
         cpal::SampleFormat::I16 => make_stream::<i16>(&device, &config.into()),
+        cpal::SampleFormat::I24 => make_stream::<I24>(&device, &config.into()),
         cpal::SampleFormat::I32 => make_stream::<i32>(&device, &config.into()),
         cpal::SampleFormat::I64 => make_stream::<i64>(&device, &config.into()),
         cpal::SampleFormat::U8 => make_stream::<u8>(&device, &config.into()),
@@ -122,7 +123,7 @@ pub fn host_device_setup(
     println!("Output device : {}", device.name()?);
 
     let config = device.default_output_config()?;
-    println!("Default output config : {:?}", config);
+    println!("Default output config : {config:?}");
 
     Ok((host, device, config))
 }
@@ -141,10 +142,10 @@ where
         current_sample_index: 0.0,
         frequency_hz: 440.0,
     };
-    let err_fn = |err| eprintln!("Error building output sound stream: {}", err);
+    let err_fn = |err| eprintln!("Error building output sound stream: {err}");
 
     let time_at_start = std::time::Instant::now();
-    println!("Time at start: {:?}", time_at_start);
+    println!("Time at start: {time_at_start:?}");
 
     let stream = device.build_output_stream(
         config,

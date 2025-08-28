@@ -1,7 +1,7 @@
 use clap::Parser;
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
-    FromSample, Sample, SizedSample,
+    FromSample, Sample, SizedSample, I24,
 };
 
 #[derive(Parser, Debug)]
@@ -73,12 +73,12 @@ fn main() -> anyhow::Result<()> {
     println!("Output device: {}", device.name()?);
 
     let config = device.default_output_config().unwrap();
-    println!("Default output config: {:?}", config);
+    println!("Default output config: {config:?}");
 
     match config.sample_format() {
         cpal::SampleFormat::I8 => run::<i8>(&device, &config.into()),
         cpal::SampleFormat::I16 => run::<i16>(&device, &config.into()),
-        // cpal::SampleFormat::I24 => run::<I24>(&device, &config.into()),
+        cpal::SampleFormat::I24 => run::<I24>(&device, &config.into()),
         cpal::SampleFormat::I32 => run::<i32>(&device, &config.into()),
         // cpal::SampleFormat::I48 => run::<I48>(&device, &config.into()),
         cpal::SampleFormat::I64 => run::<i64>(&device, &config.into()),
@@ -108,7 +108,7 @@ where
         (sample_clock * 440.0 * 2.0 * std::f32::consts::PI / sample_rate).sin()
     };
 
-    let err_fn = |err| eprintln!("an error occurred on stream: {}", err);
+    let err_fn = |err| eprintln!("an error occurred on stream: {err}");
 
     let stream = device.build_output_stream(
         config,
